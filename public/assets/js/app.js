@@ -1,4 +1,5 @@
-//Handle Scrape button
+//Scrape button from main.handlebars nav bar
+//exectues GET when the scrape request is clicked
 $("#scrape").on("click", function () {
   $.ajax({
     method: "GET",
@@ -9,7 +10,7 @@ $("#scrape").on("click", function () {
   })
 });
 
-//Handle Save Article button
+//Executes POST when save article button from home.handlebars
 $(".save").on("click", function () {
   console.log("clicked");
   var thisId = $(this).attr("data-id");
@@ -21,7 +22,18 @@ $(".save").on("click", function () {
   })
 });
 
-// Grab the articles as a json
+//Executes POST when delete article button from the savedArticles.handlebars page
+$(".delete").on("click", function () {
+  var thisId = $(this).attr("data-id");
+  $.ajax({
+    method: "POST",
+    url: "/articles/delete/" + thisId
+  }).done(function (data) {
+    window.location = "/saved"
+  })
+});
+
+// Executes the /articles page and list the data in JSON format
 $.getJSON("/articles", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
@@ -30,42 +42,8 @@ $.getJSON("/articles", function(data) {
   }
 });
 
-
-// When someone clicks on an article to save it .it routes to the server to bring up /articles/:id
-$('button').on("click", "p", function() {
-  // Empty the notes from the note section
-  $("#notes").empty();
-  // Save the id from the p tag
-  var thisId = $(this).attr("data-id");
-
-  // Now make an ajax call for the Article
-  $.ajax({
-    method: "GET",
-    url: "/articles/" + thisId
-  })
-    // With that done, add the note information to the page
-    .then(function(data) {
-      console.log("data = ", data);
-      // The title of the article
-      $("#notes").append("<h4>" + data.title + "</h>");
-      // An input to en ter a new title
-      $("#notes").append("<input id='titleinput' name='title' >");
-      // A textarea to add a new note body
-      $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
-      // A button to submit a new note, with the id of the article saved to it
-      $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-
-      // If there's a note in the article
-      if (data.note) {
-        // Place the title of the note in the title input
-        $("#titleinput").val(data.note.title);
-        // Place the body of the note in the body textarea
-        $("#bodyinput").val(data.note.body);
-      }
-    });
-});
-
-// When you click the savenote button
+//
+// Executes a POST when sabe note id is clicked
 $(document).on("click", "#savenote", function() {
   // Grab the id associated with the article from the submit button
   var thisId = $(this).attr("data-id");

@@ -4,13 +4,12 @@ var logger = require("morgan");
 var mongoose = require("mongoose");
 var path = require("path");
 
-// Our scraping tools
+// Scraping tools
 var request = require("request");
 var cheerio = require("cheerio");
 
 // Require all models
 var db = require("./models");
-// Requiring Note and Article models
 
 var PORT = 3000;
 
@@ -26,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 
-// Set Handlebars.
+// Handlebars. :o
 var exphbs = require("express-handlebars");
 
 app.engine("handlebars", exphbs({
@@ -37,10 +36,9 @@ app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB
 mongoose.connect("mongodb://localhost/freeBeacon");
-// var db = mongoose.connection;
 
 // Routes
-// A GET route for scraping the echoJS website
+// A GET route for scraping the Free Beacon website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with request
 request("http://freebeacon.com/columns/", function (error, response, html) {
@@ -51,14 +49,9 @@ request("http://freebeacon.com/columns/", function (error, response, html) {
       $("article").each(function (i, element) {
             // Save an empty result object
             var result = {};
-
             // Add the text and href of every link, and save them as properties of the result object
-
-            // result.title = $(this).children("a").text();
             result.title = $(this).children("header").children("h2").text();
-            // result.link = $(this).children("a").attr("href");
             result.link = $(this).children("header").children("h2").children("a").attr("href");
-
             // result.summmary = $(this).children(".subheadline").text();
             // console.log("result.Summary = ", result.summary)
        
@@ -73,7 +66,6 @@ request("http://freebeacon.com/columns/", function (error, response, html) {
           return res.json(err);
         });
     });
-
     // If we were able to successfully scrape and save an Article, send a message to the client
     res.send("Scrape Complete");
   });
@@ -95,7 +87,7 @@ app.get("/articles", function (req, res) {
     });
 });
 
-//GET requests to render Handlebars pages
+//GET requests to render home.handlebars pages
 app.get("/", function (req, res) {
   db.Article.find({
     "saved": false
@@ -108,7 +100,7 @@ app.get("/", function (req, res) {
   });
 });
 
-// Save an article
+// POST request to save an article
 app.post("/articles/saved/:id", function (req, res) {
   // Use the article id to find and update its saved boolean
   db.Article.findOneAndUpdate({
@@ -128,7 +120,28 @@ app.post("/articles/saved/:id", function (req, res) {
     });
 });
 
-//Get saved articles
+// Post request to delete an saved status on article
+app.post("/articles/delete/:id", function (req, res) {
+  // Use the article id to find and update its saved boolean
+  db.Article.findOneAndUpdate({
+      "_id": req.params.id
+    }, {
+      "saved": false,
+      "notes": []
+    })
+    // Execute the above query
+    .exec(function (err, doc) {
+      // Log any errors
+      if (err) {
+        console.log(err);
+      } else {
+        // Or send the document to the browser
+        res.send(doc);
+      }
+    });
+});
+
+//GET request to go to savedArticles.handlebars and render saved articles
 app.get("/saved", function (req, res) {
   db.Article.find({
     "saved": true
@@ -140,9 +153,8 @@ app.get("/saved", function (req, res) {
   });
 });
 
-
-
-// Route for grabbing a specific Article by id, populate it with it's note
+// ************************ still need to do this.
+// GET request for attaching note to its' corresping article id.
 app.get("/articles/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   db.Article.findOne({ _id: req.params.id })
@@ -157,26 +169,6 @@ app.get("/articles/:id", function(req, res) {
       res.json(err);
     });
 });
-
-// Route for saving/updating an Article's associated Note
-// app.post("/articles/:id", function(req, res) {
-//   // Create a new note and pass the req.body to the entry
-//   db.Note.create(req.body)
-//     .then(function(dbNote) {
-//       // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
-//       // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-//       // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-//       return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
-//     })
-//     .then(function(dbArticle) {
-//       // If we were able to successfully update an Article, send it back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
 
 // Start the server
 app.listen(PORT, function() {
