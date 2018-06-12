@@ -11,7 +11,17 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+var PORT = process.env.MONGODB_URI || 3000;
+
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/freeBeacon";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
+
 
 // Initialize Express
 var app = express();
@@ -35,7 +45,7 @@ app.engine("handlebars", exphbs({
 app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/freeBeacon");
+// mongoose.connect("mongodb://localhost/freeBeacon");
 
 // Routes
 // A GET route for scraping the Free Beacon website
@@ -52,8 +62,8 @@ request("http://freebeacon.com/columns/", function (error, response, html) {
             // Add the text and href of every link, and save them as properties of the result object
             result.title = $(this).children("header").children("h2").text();
             result.link = $(this).children("header").children("h2").children("a").attr("href");
-            // result.summmary = $(this).children(".subheadline").text();
-            // console.log("result.Summary = ", result.summary)
+            result.condensed = $(this).children(".subheadline").children("a").text();
+            // console.log("result.summary = ", result.condensed)
        
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
@@ -95,7 +105,7 @@ app.get("/", function (req, res) {
     var hbsObject = {
       article: data
     };
-    console.log(hbsObject);
+    // console.log(hbsObject);
     res.render("home", hbsObject);
   });
 });
@@ -155,7 +165,7 @@ app.get("/saved", function (req, res) {
 
 // ************************ still need to do this.
 // GET request for attaching note to its' corresping article id.
-app.get("/articles/:id", function(req, res) {
+app.post("/saved/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   db.Article.findOne({ _id: req.params.id })
     // ..and populate all of the notes associated with it
@@ -174,3 +184,10 @@ app.get("/articles/:id", function(req, res) {
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
 });
+
+
+// get the save note to work
+// delete database on scrape
+// connect to heroku
+
+

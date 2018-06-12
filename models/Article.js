@@ -15,10 +15,11 @@ var ArticleSchema = new Schema({
     type: String,
     required: true
   },
-  // summary: {
-  //   type: String,
-  //   required: true
-  // },
+  condensed: {
+    type: String,
+    required: true
+    
+  },
   saved: {
     type: Boolean,
     default: false
