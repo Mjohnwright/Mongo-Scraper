@@ -64,7 +64,8 @@ app.get("/scrape", function (req, res) {
       result.title = $(this).children("header").children("h2").text();
       result.link = $(this).children("header").children("h2").children("a").attr("href");
       result.condensed = $(this).children(".subheadline").children("a").text();
-      // console.log("result.summary = ", result.condensed)
+      // result.released = $(this).children(".entry-meta").children("p").children("time").attr("datetime");
+      // console.log("result.summary = ", result.released)
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)

@@ -7,6 +7,10 @@ body {
     
 }
 
+#scrape {
+    margin-top: 7px;
+}
+
 .jumbotron {
  font-size: 15px;
  font-weight: bolder;
