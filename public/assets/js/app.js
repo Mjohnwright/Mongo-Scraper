@@ -24,12 +24,15 @@ $(".save").on("click", function () {
 
 //Executes POST when delete article button from the savedArticles.handlebars page
 $(".delete").on("click", function () {
+  console.log("delete clicked");
   var thisId = $(this).attr("data-id");
   $.ajax({
     method: "POST",
     url: "/articles/delete/" + thisId
   }).done(function (data) {
   })
+      window.location = "/saved"
+
 });
 
 // Executes a POST when to save note

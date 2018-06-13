@@ -131,7 +131,7 @@ app.post("/articles/delete/:id", function (req, res) {
         console.log(err);
       } else {
         // Or send the document to the browser
-        res.send(doc);
+        
       }
     });
 });
