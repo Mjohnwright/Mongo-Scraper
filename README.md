@@ -16,6 +16,6 @@ The Mongo-Scraper application lets users scrape the Washington Free Beacon for t
 * Firebase database
 
 ### Screenshot
-![Full Size](assets/images/mongoimg.png)
+![Full Size](/assets/images/mongoimg.png)
 
 ### DataBase
