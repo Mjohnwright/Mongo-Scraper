@@ -35,17 +35,15 @@ $(".delete").on("click", function () {
 
 });
 
-// Executes a POST to save note
-//notes.handlebars page
-$(document).on("click", ".savenote", function () {
-  console.log("save note is clicked");
+// Executes a POST when to save note
+$(document).on("click", ".saveNote", function () {
+  console.log("sasve note is clicked");
   // Grab the id associated with the article from the submit button
   var thisId = $(this).attr("data-id");
 
-  // Run a POST request to change the note, using what's entered in the inputs
   $.ajax({
       method: "POST",
-      url: "/notes/articles/" + thisId,
+      url: "notes/articles/" + thisId,
       data: {
         // Value taken from title input
         title: $("#titleinput").val(),
@@ -53,21 +51,20 @@ $(document).on("click", ".savenote", function () {
         body: $("#bodyinput").val()
       }
     })
-
+    // With that done
     .then(function (data) {
       // Log the response
       console.log(data);
       // Empty the notes section
       $("#notes").empty();
-          window.location = "/saved"
-
     });
 
-  // Remove the values entered in the input and textarea for note entry
+  // Also, remove the values entered in the input and textarea for note entry
   $("#titleinput").val("");
   $("#bodyinput").val("");
+  //closes modal and returns to the savedAricles.handlebars page
+  window.location = "/saved"
 });
-
 
 // Executes the /articles page and list the data in JSON format
 $.getJSON("/articles", function (data) {
