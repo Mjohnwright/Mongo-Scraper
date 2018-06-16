@@ -21,7 +21,6 @@ var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/freeBeacon";
 mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI);
 
-
 // Initialize Express
 var app = express();
 
